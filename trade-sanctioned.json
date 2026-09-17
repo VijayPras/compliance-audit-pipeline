@@ -1,0 +1,8 @@
+{
+  "accountId": "ACC-100",
+  "counterparty": "Some Counterparty",
+  "countryCode": "IR",
+  "tradeType": "BUY",
+  "notionalAmount": 50000,
+  "currency": "USD"
+}

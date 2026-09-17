@@ -1,0 +1,279 @@
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.16)
+
+2026-09-17T19:45:59.770+05:30  INFO 22520 --- [           main] c.a.a.AuditServiceApplication            : Starting AuditServiceApplication using Java 17.0.12 with PID 22520 (C:\Users\vijay\Documents\Projects (do not delete)\Audit Pipeline Project\compliance-audit-pipeline\audit-service\target\classes started by vijay in C:\Users\vijay\Documents\Projects (do not delete)\Audit Pipeline Project\compliance-audit-pipeline\audit-service)
+2026-09-17T19:45:59.774+05:30  INFO 22520 --- [           main] c.a.a.AuditServiceApplication            : The following 1 profile is active: "local"
+2026-09-17T19:46:00.805+05:30  INFO 22520 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-17T19:46:00.909+05:30  INFO 22520 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 87 ms. Found 2 JPA repository interfaces.
+2026-09-17T19:46:01.743+05:30  INFO 22520 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2026-09-17T19:46:01.765+05:30  INFO 22520 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-17T19:46:01.765+05:30  INFO 22520 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.55]
+2026-09-17T19:46:01.855+05:30  INFO 22520 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-09-17T19:46:01.857+05:30  INFO 22520 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2011 ms
+2026-09-17T19:46:02.235+05:30  INFO 22520 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-17T19:46:02.432+05:30  INFO 22520 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@28e8888d
+2026-09-17T19:46:02.434+05:30  INFO 22520 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-17T19:46:02.482+05:30  INFO 22520 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/audit_pipeline (PostgreSQL 17.11)
+2026-09-17T19:46:02.549+05:30  INFO 22520 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 2 migrations (execution time 00:00.035s)
+2026-09-17T19:46:02.589+05:30  INFO 22520 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-09-17T19:46:02.593+05:30  INFO 22520 --- [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-09-17T19:46:02.736+05:30  INFO 22520 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-09-17T19:46:02.784+05:30  INFO 22520 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.53.Final
+2026-09-17T19:46:02.815+05:30  INFO 22520 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-09-17T19:46:03.138+05:30  INFO 22520 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-17T19:46:03.230+05:30  INFO 22520 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.11
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-09-17T19:46:03.967+05:30  INFO 22520 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-17T19:46:04.011+05:30  INFO 22520 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-17T19:46:05.034+05:30  INFO 22520 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/'
+2026-09-17T19:46:05.081+05:30  INFO 22520 --- [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9094]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-audit-service-sse-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = audit-service-sse
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.header.urlencode = false
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+2026-09-17T19:46:05.130+05:30  INFO 22520 --- [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-09-17T19:46:05.287+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.9.2
+2026-09-17T19:46:05.287+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 5e9866f43ab8e7e4
+2026-09-17T19:46:05.287+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1789654565279
+2026-09-17T19:46:05.292+05:30  INFO 22520 --- [           main] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Subscribed to topic(s): compliance-alerts.v1
+2026-09-17T19:46:05.313+05:30  INFO 22520 --- [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9094]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-audit-service-2
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = audit-service
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.header.urlencode = false
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+2026-09-17T19:46:05.314+05:30  INFO 22520 --- [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-09-17T19:46:05.343+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.9.2
+2026-09-17T19:46:05.343+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 5e9866f43ab8e7e4
+2026-09-17T19:46:05.343+05:30  INFO 22520 --- [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1789654565343
+2026-09-17T19:46:05.343+05:30  INFO 22520 --- [           main] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Subscribed to topic(s): trade-events.v1
+2026-09-17T19:46:05.359+05:30  INFO 22520 --- [           main] c.a.a.AuditServiceApplication            : Started AuditServiceApplication in 6.23 seconds (process running for 6.766)
+2026-09-17T19:46:05.879+05:30  WARN 22520 --- [ntainer#1-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] The metadata response from the cluster reported a recoverable issue with correlation id 2 : {trade-events.v1=UNKNOWN_TOPIC_OR_PARTITION}
+2026-09-17T19:46:05.879+05:30  WARN 22520 --- [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] The metadata response from the cluster reported a recoverable issue with correlation id 2 : {compliance-alerts.v1=UNKNOWN_TOPIC_OR_PARTITION}
+2026-09-17T19:46:05.881+05:30  INFO 22520 --- [ntainer#0-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Cluster ID: 4L6g3nShT-eMCtK--X86sw
+2026-09-17T19:46:05.881+05:30  INFO 22520 --- [ntainer#1-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Cluster ID: 4L6g3nShT-eMCtK--X86sw
+2026-09-17T19:46:05.882+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Discovered group coordinator localhost:9094 (id: 2147483646 rack: null)
+2026-09-17T19:46:05.882+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Discovered group coordinator localhost:9094 (id: 2147483646 rack: null)
+2026-09-17T19:46:05.886+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] (Re-)joining group
+2026-09-17T19:46:05.886+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] (Re-)joining group
+2026-09-17T19:46:05.906+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Request joining group due to: need to re-join with the given member-id: consumer-audit-service-sse-1-9be7a665-4ce6-40e1-a02e-fe14042642d2
+2026-09-17T19:46:05.907+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Request joining group due to: need to re-join with the given member-id: consumer-audit-service-2-5083320e-e735-4fcd-b46d-651ea77494f4
+2026-09-17T19:46:05.907+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] (Re-)joining group
+2026-09-17T19:46:05.908+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] (Re-)joining group
+2026-09-17T19:46:05.917+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Successfully joined group with generation Generation{generationId=1, memberId='consumer-audit-service-2-5083320e-e735-4fcd-b46d-651ea77494f4', protocol='range'}
+2026-09-17T19:46:05.917+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Successfully joined group with generation Generation{generationId=1, memberId='consumer-audit-service-sse-1-9be7a665-4ce6-40e1-a02e-fe14042642d2', protocol='range'}
+2026-09-17T19:46:06.030+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Finished assignment for group at generation 1: {consumer-audit-service-sse-1-9be7a665-4ce6-40e1-a02e-fe14042642d2=Assignment(partitions=[compliance-alerts.v1-0])}
+2026-09-17T19:46:06.030+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Finished assignment for group at generation 1: {consumer-audit-service-2-5083320e-e735-4fcd-b46d-651ea77494f4=Assignment(partitions=[trade-events.v1-0])}
+2026-09-17T19:46:06.046+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Successfully synced group in generation Generation{generationId=1, memberId='consumer-audit-service-sse-1-9be7a665-4ce6-40e1-a02e-fe14042642d2', protocol='range'}
+2026-09-17T19:46:06.046+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Successfully synced group in generation Generation{generationId=1, memberId='consumer-audit-service-2-5083320e-e735-4fcd-b46d-651ea77494f4', protocol='range'}
+2026-09-17T19:46:06.048+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Notifying assignor about the new Assignment(partitions=[trade-events.v1-0])
+2026-09-17T19:46:06.048+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Notifying assignor about the new Assignment(partitions=[compliance-alerts.v1-0])
+2026-09-17T19:46:06.053+05:30  INFO 22520 --- [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Adding newly assigned partitions: compliance-alerts.v1-0
+2026-09-17T19:46:06.053+05:30  INFO 22520 --- [ntainer#1-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Adding newly assigned partitions: trade-events.v1-0
+2026-09-17T19:46:06.067+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Found no committed offset for partition trade-events.v1-0
+2026-09-17T19:46:06.067+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Found no committed offset for partition compliance-alerts.v1-0
+2026-09-17T19:46:06.074+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.SubscriptionState    : [Consumer clientId=consumer-audit-service-sse-1, groupId=audit-service-sse] Resetting offset for partition compliance-alerts.v1-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9094 (id: 1 rack: null)], epoch=0}}.
+2026-09-17T19:46:06.074+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.a.k.c.c.internals.SubscriptionState    : [Consumer clientId=consumer-audit-service-2, groupId=audit-service] Resetting offset for partition trade-events.v1-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9094 (id: 1 rack: null)], epoch=0}}.
+2026-09-17T19:46:06.075+05:30  INFO 22520 --- [ntainer#1-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : audit-service: partitions assigned: [trade-events.v1-0]
+2026-09-17T19:46:06.075+05:30  INFO 22520 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : audit-service-sse: partitions assigned: [compliance-alerts.v1-0]
