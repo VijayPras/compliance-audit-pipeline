@@ -5,10 +5,12 @@ Running summary of everything done on this project so far. Updated after each re
 ## Where things stand
 
 - **Repo**: [github.com/VijayPras/compliance-audit-pipeline](https://github.com/VijayPras/compliance-audit-pipeline), cloned locally to `Audit Pipeline Project/compliance-audit-pipeline`.
-- **Infra (Docker)**: Postgres, Kafka, Kafka Connect (Debezium), Kafka UI — all running and healthy locally.
-- **Order Service**: Spring Boot app scaffolded, builds clean, runs, and has successfully processed one real trade end-to-end through the whole pipeline (Postgres → Debezium → Kafka).
-- **Audit Service**: Spring Boot app scaffolded — idempotent consumer, rule engine, SSE endpoint. Not yet built/run on Vijay's machine.
-- **Dashboard**: not started yet (Phase 3 of the build plan).
+- **Infra (Docker)**: Postgres, Kafka, Kafka Connect (Debezium), Kafka UI — all running and healthy locally, Kafka and Postgres both on persistent named volumes now.
+- **Order Service**: Spring Boot app scaffolded, builds clean, runs, and has successfully processed real trades end-to-end — confirmed all the way through to a message landing on `trade-events.v1` in Kafka UI.
+- **Audit Service**: Spring Boot app scaffolded and running — idempotent consumer, rule engine, SSE endpoint. Fully proven end-to-end: a flagged trade correctly produces an alert on `compliance-alerts.v1`.
+- **Dashboard**: built and working — a Vite + React app (`dashboard/`) subscribing to Audit Service's SSE stream via a native `EventSource`, rendering compliance alerts live as they arrive, no polling/refresh. Confirmed working against a real submitted trade.
+
+**The entire build plan is now complete and demoable end-to-end**: submit a trade via Order Service → it's recorded via the transactional outbox pattern → Debezium/Kafka Connect picks it up via CDC → published to `trade-events.v1` → Audit Service consumes it idempotently, runs it through the rule engine → publishes an alert to `compliance-alerts.v1` if flagged → the alert appears live on the dashboard within about a second, no manual refresh.
 
 ## 1. Planning
 
@@ -45,7 +47,7 @@ Debugging along the way:
 3. **`FATAL: invalid value for parameter "TimeZone": "Asia/Calcutta"`** — Windows reports the local timezone to Java using an old IANA alias that newer Postgres builds no longer recognize. Fixed by forcing `user.timezone=Asia/Kolkata` as a JVM system property before Spring starts.
 4. **PowerShell `curl` quoting issues** when submitting test requests — PowerShell aliases `curl` to `Invoke-WebRequest`, which doesn't accept real curl flags. Fixed by calling `curl.exe` explicitly, and by writing JSON payloads to a file (`--data "@file.json"`) instead of inlining them, since PowerShell mangles escaped quotes in long inline strings.
 
-**Result**: Debezium connector registered successfully; a real trade was submitted via `POST /api/v1/trades` and got a `201` back with a generated trade ID — confirming the trade committed to Postgres. *(Still to visually confirm: that the trade shows up as a message on the `trade-events.v1` topic in Kafka UI — last step before calling Phase 1 fully done.)*
+**Result**: Debezium connector registered successfully; a real trade was submitted via `POST /api/v1/trades` and got a `201` back with a generated trade ID, confirming the trade committed to Postgres — and, after the additional debugging in section 5 below, confirmed visually in Kafka UI as a message on `trade-events.v1`. **Phase 1 is fully done end-to-end.**
 
 ## 4. Config refactor (per Vijay's preference)
 
@@ -66,6 +68,49 @@ Scaffolded a second Spring Boot 3.5.16 / Java 17 app, `audit-service`, following
 
 Not yet built or run on Vijay's machine — next step is `mvn clean install` + `mvn spring-boot:run` (port 8082) and firing another trade through the Order Service to watch an alert come out the other end.
 
-## Next up
+**First run hit an error**: `org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [audit_results]`. Root cause found via the full startup log + a manual `psql` check of `flyway_schema_history_audit_service`: Flyway never actually ran `V1__init.sql` — it **baselined** instead (`installed_rank 1, type BASELINE, description << Flyway Baseline >>, version 1`). Reason: `spring.flyway.baseline-on-migrate=true` triggers whenever Flyway sees a non-empty schema with no history table yet, and it checks at the *whole-schema* level, not per-service — since audit-service shares the same Postgres `public` schema as order-service (which already had `trades` and `outbox_events` in it), Flyway saw a non-empty schema on audit-service's first run and baselined. `baseline-version` defaults to `1`, and `V1__init.sql` is also version 1, so Flyway treated its own real migration as "already applied" and silently skipped it — no tables, no error until Hibernate's validation caught the gap.
 
-Get audit-service building and running locally, submit a trade that trips a rule (e.g. above the 100000 threshold, or to a sanctioned country code), and confirm a message lands on `compliance-alerts.v1` in Kafka UI. Then Phase 3: the React dashboard.
+**Fix**: added `spring.flyway.baseline-version=0` to `audit-service/src/main/resources/local_auditpipeline.properties`, so the baseline stamps as version 0 and the real `V1__init.sql` (version 1) still runs afterward, plus dropped the stale `flyway_schema_history_audit_service` table so Flyway re-evaluated from scratch. **Confirmed working** — audit-service now migrates cleanly and starts.
+
+**Second issue hit on first real run — `UnknownHostException: kafka`**: audit-service runs on the host machine (not inside Docker), but Kafka's only listener was advertised as `kafka:9092`, a hostname that only resolves inside the Docker network. Fixed by adding a second Kafka listener (`PLAINTEXT_HOST` on `9094`, advertised as `localhost:9094`) already present in `docker-compose.yml`'s `KAFKA_ADVERTISED_LISTENERS`, but the `ports:` section wasn't actually publishing `9094` out of the container — added `"9094:9094"` to the `kafka` service's `ports`, and pointed `audit-service`'s `spring.kafka.bootstrap-servers` at `localhost:9094` instead of `9092`. **Confirmed working.**
+
+**Third issue — Debezium connector silently stopped publishing anything.** Root cause: the `kafka` service in `docker-compose.yml` had no persistent volume, so recreating the container (to pick up the port change above) wiped every Kafka topic, including Kafka Connect's own internal config/offset/status topics where the connector's registration lived. Fixed two ways: (1) added a named `kafka-data` volume mounted at `/var/lib/kafka/data` (with `KAFKA_LOG_DIRS` pointed at the same path) so future container recreations don't lose topic data; (2) re-registered the connector via the same `register-postgres-connector.json` POST used originally. Along the way also fixed a secondary Kafka Connect issue — its internal `status`/`offset` topics got auto-created with only 1 partition (Kafka's bare default) while Connect expected more, causing a log-spamming `UNKNOWN_TOPIC_OR_PARTITION` warning loop; fixed by explicitly setting `OFFSET_STORAGE_PARTITIONS` / `STATUS_STORAGE_PARTITIONS` to `"1"` on the `kafka-connect` service so the counts match on creation.
+
+**Fourth issue — the real blocker, found once the connector was healthy and actually processing a trade**: the task crashed immediately with `DataException: Field 'created_at' is not of type INT64` inside Debezium's outbox `EventRouterDelegate`. Root cause: `register-postgres-connector.json` mapped `transforms.outbox.table.field.event.timestamp` to `created_at`, but that column is `TIMESTAMPTZ` in Postgres, which Debezium represents internally as a `ZonedTimestamp` (a string), not the `INT64` epoch-millis type the outbox router's timestamp feature requires (that only works cleanly against a timezone-less `TIMESTAMP` column). Since nothing downstream actually reads the Kafka record's own timestamp (audit-service parses `createdAt` straight out of the JSON payload instead), fixed by simply removing the `transforms.outbox.table.field.event.timestamp` line from `register-postgres-connector.json` and re-registering the connector. **Confirmed working** — `trade-events.v1` now shows a real message in Kafka UI for a submitted trade.
+
+**Result**: the full CDC pipe (Postgres → Debezium → Kafka) is proven working end-to-end again, this time with audit-service's consumers also up and listening.
+
+**Fifth issue — found on the very next step (a real trade actually reaching audit-service)**: audit-service's consumer crashed with `MismatchedInputException: Cannot construct instance of TradeEventPayload ... no String-argument constructor`, and the Kafka UI message value showed `"{\"status\": \"EXECUTED\", ...}"` — a JSON string wrapping more JSON text, i.e. **double-encoded JSON**. Root cause: `outbox_events.payload` is `JSONB`, which Debezium represents as a plain Kafka Connect `STRING` field holding raw JSON text. The outbox router passes that string straight through as the record value, but with `value.converter: JsonConverter` and schemas disabled, `JsonConverter` doesn't know that string is "already JSON" — it serializes it as a quoted JSON string, escaping everything inside. **Fix**: added `"transforms.outbox.table.expand.json.payload": "true"` to `register-postgres-connector.json`, so the outbox router parses the payload into a real structured object before handing it to the converter, and deleted + re-registered the connector. **Confirmed working** — `trade-events.v1` values now render as clean, unescaped JSON objects.
+
+**Sixth issue — same double-encoding bug, but on the Kafka record *key* this time**: with the payload fixed, audit-service's consumer immediately hit a new error, `IllegalArgumentException: UUID string too large` in `AuditProcessingService.process()`. Kafka UI showed the message *key* wrapped in quotes (`"c2570825-...454"`, 38 characters instead of 36). Root cause: the connector's `key.converter` was also `JsonConverter`, and the outbox record's key (the `aggregate_id` column — a plain UUID string, not JSON) got the same quoting treatment as the payload had. Since the key genuinely isn't JSON, there's no "expand" option for it — **fix**: changed `key.converter` from `org.apache.kafka.connect.json.JsonConverter` to `org.apache.kafka.connect.storage.StringConverter` in `register-postgres-connector.json` (and dropped the now-irrelevant `key.converter.schemas.enable` line), then deleted + re-registered the connector. **Confirmed working** — Kafka UI now shows a clean, unquoted UUID as the key (`Key Serde: String, Size: 36 Bytes`).
+
+Also created for the repo: `README.md` (public-facing project README — architecture, tech stack, setup instructions, status) and `PROJECT_OVERVIEW.md` (plain-language explanation of the project's purpose and plan), both committed to the connected local repo folder.
+
+**Phase 2 is now fully proven end-to-end.** Confirmed via a real sanctioned-country trade: audit-service logged `Processed trade 9b013489-... -- flagged=true reasons=[SANCTIONED_COUNTERPARTY_COUNTRY]`, and Kafka UI shows the corresponding alert on `compliance-alerts.v1` with the full trade details and `reasons: ["SANCTIONED_COUNTERPARTY_COUNTRY"]`. The whole pipeline — outbox write → Debezium CDC → Kafka → idempotent consumer → rule engine → alert topic — works.
+
+## 6. Dashboard (Phase 3)
+
+Built `dashboard/` — a Vite + React app, chosen over a plain HTML file to match the original architecture doc and read as a complete standalone frontend project on the resume/repo. Installed Node.js via `winget install OpenJS.NodeJS.LTS` (same pattern as the earlier Maven install) since Vijay didn't have Node set up.
+
+- `src/App.jsx` — opens a native browser `EventSource` connection to `http://localhost:8082/api/v1/compliance/stream` (no polling, no WebSocket handshake), listens for the named `compliance-alert` SSE event, and renders each alert as a card (trade amount, account → counterparty/country, and which rules it tripped) with the newest on top and a small slide-in animation. Shows a live connection-status badge (connecting / live / reconnecting — the browser's `EventSource` auto-reconnects on its own on a dropped connection, no manual reconnect logic needed).
+- Plain CSS, dark theme, no extra UI framework — kept deliberately lightweight since the point is the real-time behavior, not the styling.
+- **CORS fix required**: the dashboard (`localhost:5173`, Vite's dev server) and audit-service (`localhost:8082`) are different origins, so the browser blocked the `EventSource` connection until `@CrossOrigin(origins = "http://localhost:5173")` was added to `ComplianceStreamController.stream()`. Scoped to the Vite dev port deliberately — noted in the code as a local-dev-only allowance, not something to carry into a real deployment as-is.
+- One small process hiccup along the way: ran `mvn spring-boot:run` from inside `dashboard/` (a Node project, no `pom.xml`) instead of `audit-service/`, producing a `No plugin found for prefix 'spring-boot'` error — not a bug, just wrong working directory; resolved immediately once pointed out.
+
+**Confirmed working**: submitted a real trade, watched the alert appear on the dashboard live (`$50,000.00`, `ACC-100 → Some Counterparty (IR)`, `Sanctioned counterparty country` pill) within about a second of the trade being processed, no refresh.
+
+## Project complete
+
+All three phases of the original build plan are done and proven end-to-end:
+
+1. **Order Service** — trade ingestion via the transactional outbox pattern.
+2. **Audit Service** — Debezium CDC → Kafka → idempotent consumer → rule engine → alert topic.
+3. **Dashboard** — live SSE-driven UI showing alerts the moment they're raised.
+
+## Possible next steps (optional, not required for the project to be "done")
+
+- Swap the illustrative sanctioned-country list for a real OFAC SDN snapshot, per the original build plan's "genuine use case" idea.
+- Add a few more rule types, or make the velocity/threshold rules visible/configurable from the dashboard itself.
+- Write a couple of integration tests (e.g. for `AuditProcessingService`'s idempotency check, or `RuleEngine`'s rule logic) — good for demonstrating test discipline in an interview.
+- Commit and push everything to GitHub (`git add` / `git commit` / `git push`) — hasn't been done yet; the repo has only been worked on locally so far.
+- Tidy up: delete the old `order-service/application.yml` (still pending from the earlier config refactor), and clean up stray files in the repo root (`logs.txt`, `currentlogs.txt`, `hs_err_pid15656.log`, `.gitignore.txt` — probably meant to be `.gitignore`).
